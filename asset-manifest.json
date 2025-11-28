@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/journal-management-system/static/css/main.336176c6.css",
+    "main.js": "/journal-management-system/static/js/main.ddae863a.js",
+    "index.html": "/journal-management-system/index.html",
+    "main.336176c6.css.map": "/journal-management-system/static/css/main.336176c6.css.map",
+    "main.ddae863a.js.map": "/journal-management-system/static/js/main.ddae863a.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.336176c6.css",
+    "static/js/main.ddae863a.js"
+  ]
+}
