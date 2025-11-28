@@ -1,0 +1,19 @@
+# Backend ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: research-journal
+data:
+  SPRING_PROFILES_ACTIVE: "docker"
+  SPRING_DATASOURCE_URL: "jdbc:mysql://mysql-service:3306/research_journal?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+  JWT_EXPIRATION: "86400000"
+---
+# Frontend ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: research-journal
+data:
+  REACT_APP_API_URL: "/api"

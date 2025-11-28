@@ -1,0 +1,70 @@
+services:
+  # MySQL Database - Port 3307 (external) -> 3306 (internal)
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: research-journal-db
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: research_journal
+      MYSQL_USER: journal_user
+      MYSQL_PASSWORD: journal_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - journal-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # Spring Boot Backend - Port 8081 (external) -> 8080 (internal)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: research-journal-backend
+    ports:
+      - "8081:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/research_journal?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      JWT_SECRET: mySecretKeyForJWTTokenGenerationThatIsLongEnoughForHS512Algorithm123456789
+      JWT_EXPIRATION: 86400000
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - journal-network
+    restart: unless-stopped
+
+  # React Frontend - Port 3001 (external) -> 80 (internal)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: research-journal-frontend
+    ports:
+      - "3001:80"
+    environment:
+      REACT_APP_API_URL: http://localhost:8081/api
+    depends_on:
+      - backend
+    networks:
+      - journal-network
+    restart: unless-stopped
+
+networks:
+  journal-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
